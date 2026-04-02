@@ -13,66 +13,67 @@
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0f172a; color: white; padding-bottom: 50px; }
         
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
-        
         .header { text-align: center; padding: 30px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .pump-logo { font-size: 3rem; color: var(--green); filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5)); margin-bottom: 5px; }
+        .pump-logo { font-size: 3rem; color: var(--green); filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5)); }
         .header h1 { margin: 0; letter-spacing: 4px; font-size: 1.8rem; text-transform: uppercase; }
 
         .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 20px; margin-bottom: 20px; }
-
         .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
         input, select { flex: 1; padding: 15px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; color: white; outline: none; font-size: 16px; }
 
         #customRangeBox { display: none; margin-bottom: 12px; }
-
         .btn-gps { background: rgba(0, 210, 255, 0.15); color: var(--blue); width: 55px; border-radius: 15px; border: 1px solid var(--blue); cursor: pointer; }
         .btn-main { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--green), var(--blue)); color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        #map { height: 350px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; z-index: 1; }
+        #map { height: 350px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; }
 
         .card { background: var(--glass); padding: 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; position: relative; }
-        .card-index { position: absolute; top: 15px; right: 20px; background: var(--blue); color: #000; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; }
-        .card.cheapest .card-index { background: var(--red); color: white; }
-        
-        .brand { font-size: 1.4rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; padding-right: 30px; }
+        .card-num { position: absolute; top: 15px; right: 20px; background: var(--blue); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; }
+        .card.cheapest .card-num { background: var(--red); color: white; }
+
+        .brand { font-size: 1.3rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; display: block; padding-right: 40px; }
         .address { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 15px; display: block; }
 
         .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .price-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .price-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .p-label { font-size: 0.7rem; font-weight: bold; color: var(--blue); }
         .p-val { font-size: 1.2rem; font-weight: 900; }
 
-        .btn-nav { width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; }
+        /* Correction centrage bouton Y ALLER */
+        .btn-nav { 
+            width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); 
+            color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; 
+            text-decoration: none; display: flex; align-items: center; justify-content: center; 
+            gap: 10px; font-weight: 800; box-sizing: border-box;
+        }
 
         #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
-        
-        /* Style des Popups sur la carte */
-        .leaflet-popup-content-wrapper { background: #1e293b; color: white; border-radius: 15px; }
+
+        /* Style Ma Position (Point Bleu) */
+        .user-pos { background: #2196F3; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #2196F3; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* Popup Map */
+        .leaflet-popup-content-wrapper { background: #1e293b; color: white; border-radius: 12px; }
         .leaflet-popup-tip { background: #1e293b; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <i class="fas fa-gas-pump pump-logo"></i>
-        <h1>PRIX CARBURANT</h1>
-    </div>
+    <div class="header"><i class="fas fa-gas-pump pump-logo"></i><h1>PRIX CARBURANT</h1></div>
 
     <div class="glass-panel">
         <div class="search-row">
             <input type="text" id="searchInput" placeholder="Ville ou Code Postal">
             <button class="btn-gps" onclick="geolocaliser()"><i class="fas fa-location-arrow"></i></button>
         </div>
-
         <select id="rangeSelect" onchange="checkCustom()">
             <option value="5000">Rayon : 5 km</option>
             <option value="10000" selected>Rayon : 10 km</option>
             <option value="20000">Rayon : 20 km</option>
-            <option value="50000">Rayon : 50 km</option>
             <option value="custom">Autres distances</option>
         </select>
-
         <div id="customRangeBox"><input type="number" id="customInput" placeholder="Distance en KM"></div>
         <button class="btn-main" style="margin-top:12px" onclick="rechercher()">Chercher</button>
     </div>
@@ -84,7 +85,7 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const MARQUES = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "CASINO", "AUCHAN", "BP", "SHELL", "NETTO", "DYNEFF", "ELAN"];
+    const MARQUES = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "AUCHAN", "BP", "SHELL", "NETTO", "DYNEFF", "ELAN", "CASINO"];
     let map = L.map('map');
     let markersLayer = L.layerGroup().addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
@@ -102,13 +103,11 @@
     async function rechercher(lat = null, lon = null) {
         const query = document.getElementById('searchInput').value.trim();
         const rSelect = document.getElementById('rangeSelect').value;
-        const cInput = document.getElementById('customInput').value;
         const resultsDiv = document.getElementById('results');
+        let rayon = (rSelect === 'custom') ? (parseInt(document.getElementById('customInput').value) * 1000) : parseInt(rSelect);
 
-        let rayon = (rSelect === 'custom') ? (parseInt(cInput) * 1000) : parseInt(rSelect);
         document.getElementById('loader').style.display = "block";
-        resultsDiv.innerHTML = "";
-        markersLayer.clearLayers();
+        resultsDiv.innerHTML = ""; markersLayer.clearLayers();
 
         let filter = (lat && lon) ? `within_distance(geom, geom'POINT(${lon} ${lat})', ${rayon}m)` : 
                      (/^\d{5}$/.test(query) ? `cp="${query}"` : `ville LIKE "${query.toUpperCase()}"`);
@@ -117,46 +116,44 @@
             const res = await fetch(`https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${encodeURIComponent(filter)}&limit=40`);
             const data = await res.json();
             document.getElementById('loader').style.display = "none";
-
-            if (!data.results || data.results.length === 0) {
-                resultsDiv.innerHTML = "<p style='text-align:center'>Aucune station.</p>";
-                return;
-            }
+            if (!data.results.length) return;
 
             document.getElementById('map').style.display = "block";
             let points = [];
-            if(lat && lon) points.push([lat, lon]);
+            
+            // --- AJOUT MA POSITION (POINT BLEU) ---
+            if(lat && lon) {
+                const userIcon = L.divIcon({ className: 'user-pos', iconSize: [12, 12] });
+                L.marker([lat, lon], {icon: userIcon}).addTo(markersLayer).bindPopup("Vous êtes ici");
+                points.push([lat, lon]);
+            }
 
-            // Tri par prix Gazole
-            data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9));
-
-            data.results.forEach((s, i) => {
+            data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9)).forEach((s, i) => {
                 let name = "Station";
                 let rawText = `${s.nom} ${s.marque} ${s.adresse}`.toUpperCase();
                 for (let m of MARQUES) { if (rawText.includes(m)) { name = m; break; } }
 
-                const idx = i + 1;
                 const isCheapest = (i === 0);
+                const color = isCheapest ? "#ff4757" : "#00d2ff";
 
                 if (s.geom) {
-                    // Création de l'icône personnalisée (Rouge pour le moins cher, Bleu pour les autres)
-                    const markerColor = isCheapest ? "red" : "blue";
-                    const icon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div style="background-color:${markerColor}; color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.5)">${idx}</div>`,
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
+                    // --- MARQUEUR EN FORME DE PING ---
+                    const pinIcon = L.divIcon({
+                        className: 'custom-pin',
+                        html: `<i class="fas fa-map-marker-alt" style="color:${color}; font-size:30px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.5))"></i>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
                     });
 
-                    L.marker([s.geom.lat, s.geom.lon], {icon: icon}).addTo(markersLayer)
-                     .bindPopup(`<div style="color:white"><b>${idx}. ${name}</b><br>Gazole: ${s.gazole_prix || '--'}€<br>E10: ${s.e10_prix || '--'}€</div>`);
+                    L.marker([s.geom.lat, s.geom.lon], {icon: pinIcon}).addTo(markersLayer)
+                     .bindPopup(`<b>Station n°${i+1}</b><br>${name}<br>⛽ Gazole: ${s.gazole_prix || '--'}€`);
                     points.push([s.geom.lat, s.geom.lon]);
                 }
 
                 resultsDiv.innerHTML += `
                     <div class="card ${isCheapest ? 'cheapest' : ''}">
-                        <div class="card-index">${idx}</div>
-                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
+                        <div class="card-num">${i+1}</div>
+                        <span class="brand">${isCheapest ? '🏆 ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
                             <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-val">${s.gazole_prix || '--'}€</span></div>
@@ -168,11 +165,9 @@
                     </div>
                 `;
             });
-
             map.fitBounds(points, {padding: [30, 30]});
             setTimeout(() => map.invalidateSize(), 300);
-
-        } catch (e) { document.getElementById('loader').style.display = "none"; alert("Erreur connexion"); }
+        } catch (e) { document.getElementById('loader').style.display = "none"; }
     }
 </script>
 </body>
