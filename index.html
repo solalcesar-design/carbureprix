@@ -108,7 +108,7 @@
         <h2>📱 Ajouter à l'accueil</h2>
         
         <div class="inst-block">
-            <h3><i class="fab fa-apple"></i> Sur iPhone / iPad (Safari)</h3>
+            <h3><i class="fab fa-apple"></i> Sur iPhone / iPad ou Mac (Safari)</h3>
             <ol>
                 <li>Appuyez sur l'icône <strong>Partager</strong> <i class="fas fa-share-square"></i> en bas de l'écran.</li>
                 <li>Choisissez <strong>"Sur l'écran d'accueil"</strong> dans la liste.</li>
@@ -200,7 +200,7 @@
                 TYPES.forEach(t => {
                     if (s[t.key]) {
                         priceHTML += `<div class="price-item"><span class="p-label">${t.label}</span><span class="p-val">${s[t.key]}€</span></div>`;
-                        popupHTML += `⛽ ${t.label}: ${s[t.key]}€<br>`;
+                        popupHTML += ` ${t.label}: ${s[t.key]}€<br>`;
                     }
                 });
 
@@ -218,7 +218,7 @@
                 resultsDiv.innerHTML += `
                     <div class="card ${isCheapest ? 'cheapest' : ''}">
                         <div class="card-num">${i+1}</div>
-                        <span class="brand">${isCheapest ? '🏆 ' : ''}${name}</span>
+                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">${priceHTML}</div>
                         <a href="https://www.google.com/maps/dir/?api=1&destination=${s.geom.lat},${s.geom.lon}" target="_blank" class="btn-nav">
