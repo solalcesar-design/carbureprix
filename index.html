@@ -39,7 +39,6 @@
         .p-label { font-size: 0.7rem; font-weight: bold; color: var(--blue); }
         .p-val { font-size: 1.2rem; font-weight: 900; }
 
-        /* Correction centrage bouton Y ALLER */
         .btn-nav { 
             width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); 
             color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; 
@@ -49,11 +48,6 @@
 
         #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
 
-        /* Style Ma Position (Point Bleu) */
-        .user-pos { background: #2196F3; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #2196F3; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
-
-        /* Popup Map */
         .leaflet-popup-content-wrapper { background: #1e293b; color: white; border-radius: 12px; }
         .leaflet-popup-tip { background: #1e293b; }
     </style>
@@ -120,13 +114,6 @@
 
             document.getElementById('map').style.display = "block";
             let points = [];
-            
-            // --- AJOUT MA POSITION (POINT BLEU) ---
-            if(lat && lon) {
-                const userIcon = L.divIcon({ className: 'user-pos', iconSize: [12, 12] });
-                L.marker([lat, lon], {icon: userIcon}).addTo(markersLayer).bindPopup("Vous êtes ici");
-                points.push([lat, lon]);
-            }
 
             data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9)).forEach((s, i) => {
                 let name = "Station";
@@ -137,7 +124,6 @@
                 const color = isCheapest ? "#ff4757" : "#00d2ff";
 
                 if (s.geom) {
-                    // --- MARQUEUR EN FORME DE PING ---
                     const pinIcon = L.divIcon({
                         className: 'custom-pin',
                         html: `<i class="fas fa-map-marker-alt" style="color:${color}; font-size:30px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.5))"></i>`,
@@ -146,14 +132,14 @@
                     });
 
                     L.marker([s.geom.lat, s.geom.lon], {icon: pinIcon}).addTo(markersLayer)
-                     .bindPopup(`<b>Station n°${i+1}</b><br>${name}<br>⛽ Gazole: ${s.gazole_prix || '--'}€`);
+                     .bindPopup(`<b>Station n°${i+1}</b><br>${name}<br>Gazole: ${s.gazole_prix || '--'}€`);    
                     points.push([s.geom.lat, s.geom.lon]);
                 }
 
                 resultsDiv.innerHTML += `
                     <div class="card ${isCheapest ? 'cheapest' : ''}">
                         <div class="card-num">${i+1}</div>
-                        <span class="brand">${isCheapest ? '🏆 ' : ''}${name}</span>
+                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
                             <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-val">${s.gazole_prix || '--'}€</span></div>
