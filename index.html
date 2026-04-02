@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GAS LIQUID - Edition Finale</title>
+    <title>PRIX CARBURANT</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -81,7 +81,7 @@
 <div class="container">
     <div class="header">
         <i class="fas fa-gas-pump pump-logo"></i>
-        <h1>GAS LIQUID</h1>
+        <h1>PRIX CARBURANT</h1>
     </div>
 
     <div class="glass-panel">
@@ -180,7 +180,7 @@
 
                 resultsDiv.innerHTML += `
                     <div class="card">
-                        <span class="brand">${i === 0 ? '🏆 ' : ''}${name}</span>
+                        <span class="brand">${i === 0 ? 'MEILLEUR PRIX ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
                             <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-val">${s.gazole_prix || '--'}€</span></div>
