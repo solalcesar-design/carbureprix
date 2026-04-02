@@ -3,188 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GAS LIQUID - Fix Localisation</title>
+    <title>GAS LIQUID - Proximité</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root {
-            --liquid-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --neon-green: #00ff87;
-            --neon-blue: #00d2ff;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--liquid-bg);
-            background-attachment: fixed;
-            color: white;
-            min-height: 100vh;
-        }
-
-        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            margin-bottom: 20px;
-        }
-
-        .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        :root { --green: #00ff87; --blue-glow: #00d2ff; --glass: rgba(255, 255, 255, 0.1); }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); background-attachment: fixed; color: white; padding-bottom: 50px; }
         
-        input, select {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 14px;
-            color: white;
-            outline: none;
+        .header { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        #map { height: 300px; margin: 15px; border-radius: 20px; border: 2px solid var(--green); display: none; z-index: 1; }
+
+        .search-container { margin: 15px; padding: 20px; background: var(--glass); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 10px; }
+        
+        .row { display: flex; gap: 10px; }
+        input, select { flex: 1; padding: 15px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; font-size: 14px; outline: none; }
+        
+        .btn-gps { background: var(--blue-glow); color: #000; width: 50px; border-radius: 12px; border: none; cursor: pointer; }
+        .btn-main { width: 100%; padding: 15px; background: var(--green); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
+        .card { background: var(--glass); margin: 15px; padding: 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Correction Nom Station */
+        .brand { font-size: 1.3rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; }
+        .address { font-size: 0.8rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 15px; }
+
+        /* Correction Grille des Prix */
+        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .price-item { 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 12px; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; /* Aligne le nom à gauche et le prix à droite */
+            align-items: center; 
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
-
-        .btn-gps {
-            width: 55px;
-            background: rgba(0, 210, 255, 0.2);
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .btn-search {
-            width: 100%;
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: 800;
-            color: #0f172a;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        #map { height: 250px; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--glass-border); display: none; }
-
-        .station-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; margin-bottom: 12px; }
-        .brand { color: var(--neon-green); font-weight: 800; font-size: 1.2rem; }
-        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-        .price-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
-        .p-val { font-size: 1.3rem; font-weight: 900; display: block; }
-        .p-label { font-size: 0.7rem; color: var(--neon-blue); }
-
-        #loader { display: none; text-align: center; padding: 20px; color: var(--neon-green); }
-        #customRangeBox { margin-top: 10px; display: none; }
+        
+        .f-name { font-size: 0.65rem; font-weight: bold; color: var(--blue-glow); text-transform: uppercase; }
+        .f-val { font-size: 1.3rem; font-weight: 900; color: #fff; margin-left: 10px; } /* Espace ajouté ici */
+        
+        #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header" style="text-align: center; padding: 20px;"><h1>GAS LIQUID</h1></div>
+<div class="header"><h1>⛽ GAS PROXY</h1></div>
 
-    <div class="glass-panel">
-        <div class="search-row">
-            <input type="text" id="searchInput" placeholder="Ville ou Code Postal">
-            <button class="btn-gps" onclick="clicGPS()" id="gpsBtn"><i class="fas fa-location-arrow"></i></button>
-        </div>
-
-        <select id="rangeSelect" onchange="checkCustom()">
-            <option value="5000">5 km</option>
-            <option value="10000" selected>10 km</option>
-            <option value="20000">20 km</option>
-            <option value="custom">Distance perso...</option>
-        </select>
-
-        <div id="customRangeBox">
-            <input type="number" id="customInput" placeholder="KM (ex: 15)">
-        </div>
-
-        <button class="btn-search" style="margin-top:12px" onclick="lancerRecherche()">Rechercher</button>
+<div class="search-container">
+    <div class="row">
+        <input type="text" id="searchInput" placeholder="Ville ou Code Postal">
+        <button class="btn-gps" onclick="geolocaliser()" title="Ma position"><i class="fas fa-location-crosshairs"></i></button>
     </div>
-
-    <div id="map"></div>
-    <div id="loader"><i class="fas fa-spinner fa-spin fa-2x"></i><br><span id="loaderMsg">Recherche...</span></div>
-    <div id="results"></div>
+    <div class="row">
+        <select id="rangeInput">
+            <option value="5000">Rayon : 5 km</option>
+            <option value="10000" selected>Rayon : 10 km</option>
+            <option value="20000">Rayon : 20 km</option>
+            <option value="50000">Rayon : 50 km</option>
+        </select>
+        <button class="btn-main" onclick="rechercher()">CHERCHER</button>
+    </div>
 </div>
+
+<div id="map"></div>
+<div id="loader"><i class="fas fa-spinner fa-spin fa-2x"></i> Localisation en cours...</div>
+<div id="results"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    let map = L.map('map');
-    let markers = L.layerGroup().addTo(map);
+    // Liste des marques à rechercher dans les données brutes
+    const MARQUES_CLEFS = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "VULCO", "CASINO", "AUCHAN", "BP", "SHELL"];
+
+    let map = L.map('map').setView([46.2, 2.2], 6);
+    let markersLayer = L.layerGroup().addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    function checkCustom() {
-        document.getElementById('customRangeBox').style.display = (document.getElementById('rangeSelect').value === 'custom') ? 'block' : 'none';
-    }
-
-    // FONCTION GPS AMELIOREE
-    function clicGPS() {
+    function geolocaliser() {
         const loader = document.getElementById('loader');
-        const loaderMsg = document.getElementById('loaderMsg');
-        
+        loader.style.display = "block";
         if (!navigator.geolocation) {
-            alert("Votre navigateur ne supporte pas la géolocalisation.");
+            alert("La géolocalisation n'est pas supportée.");
             return;
         }
-
-        loader.style.display = "block";
-        loaderMsg.innerText = "Calcul de votre position...";
-
-        const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
-
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                console.log("Position trouvée :", pos.coords.latitude, pos.coords.longitude);
-                lancerRecherche(pos.coords.latitude, pos.coords.longitude);
-            },
-            (err) => {
-                loader.style.display = "none";
-                console.error("Erreur GPS :", err);
-                if(err.code === 1) alert("Permission refusée. Activez la localisation dans les réglages du navigateur.");
-                else if(err.code === 3) alert("Délai d'attente dépassé (Time Out). Réessayez.");
-                else alert("Erreur de localisation : " + err.message);
-            },
-            options
+            (pos) => rechercher(pos.coords.latitude, pos.coords.longitude),
+            () => { loader.style.display = "none"; alert("Impossible d'accéder à votre position."); }
         );
     }
 
-    async function lancerRecherche(lat = null, lon = null) {
+    async function rechercher(lat = null, lon = null) {
         const query = document.getElementById('searchInput').value.trim();
+        const range = document.getElementById('rangeInput').value;
         const resultsDiv = document.getElementById('results');
         const loader = document.getElementById('loader');
         const mapDiv = document.getElementById('map');
-        const rangeVal = document.getElementById('rangeSelect').value;
-        const customVal = document.getElementById('customInput').value;
 
-        loader.style.display = "block";
-        document.getElementById('loaderMsg').innerText = "Récupération des prix...";
         resultsDiv.innerHTML = "";
-        markers.clearLayers();
+        markersLayer.clearLayers();
+        loader.style.display = "block";
 
-        let radius = (rangeVal === 'custom') ? (parseInt(customVal) * 1000) : parseInt(rangeVal);
         let filter = "";
-
         if (lat && lon) {
-            // Filtrage géographique précis
-            filter = `within_distance(geom, geom'POINT(${lon} ${lat})', ${radius}m)`;
+            filter = `within_distance(geom%2C%20geom'POINT(${lon}%20${lat})'%2C%20${range}m)`;
         } else if (query) {
-            filter = /^\d{5}$/.test(query) ? `cp="${query}"` : `ville LIKE "${query.toUpperCase()}"`;
+            if (/^\d{5}$/.test(query)) filter = `cp%3D%22${query}%22`;
+            else filter = `ville%20LIKE%20%22${query.toUpperCase()}%22`;
         } else {
-            alert("Veuillez saisir une ville ou cliquer sur le bouton GPS");
+            alert("Entrez une ville ou utilisez le bouton GPS.");
             loader.style.display = "none";
             return;
         }
 
-        const url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${encodeURIComponent(filter)}&limit=50`;
+        const url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${filter}&limit=50`;
 
         try {
             const res = await fetch(url);
@@ -192,45 +126,64 @@
             loader.style.display = "none";
 
             if (!data.results || data.results.length === 0) {
-                resultsDiv.innerHTML = "<p style='text-align:center'>Aucune station trouvée dans ce rayon.</p>";
-                mapDiv.style.display = "none";
+                resultsDiv.innerHTML = "<p style='text-align:center'>Aucune station dans cette zone.</p>";
                 return;
             }
 
-            mapDiv.style.display = "block";
-            let points = [];
+            // Tri par prix Gazole croissant
+            const sorted = data.results.sort((a, b) => (parseFloat(a.gazole_prix) || 99) - (parseFloat(b.gazole_prix) || 99));
 
-            // Marqueur pour votre position
-            if(lat && lon) {
-                L.circleMarker([lat, lon], {radius: 8, color: '#00d2ff', fillColor: '#00d2ff', fillOpacity: 0.8}).addTo(markers).bindPopup("Vous êtes ici");
-                points.push([lat, lon]);
+            mapDiv.style.display = "block";
+            let bounds = [];
+            if (lat && lon) {
+                L.circle([lat, lon], {radius: 200, color: 'blue'}).addTo(markersLayer).bindPopup("Vous êtes ici");
+                bounds.push([lat, lon]);
             }
 
-            // Tri par prix Gazole
-            data.results.sort((a,b) => (parseFloat(a.gazole_prix)||99) - (parseFloat(b.gazole_prix)||99));
-
-            data.results.forEach((s, i) => {
+            sorted.forEach((s, i) => {
+                // --- Nettoyage et identification de la marque ---
+                let nomNettoye = "STATION";
+                // On combine tous les champs de texte bruts fournis par l'API
+                let texteBrut = (s.adresse + " " + s.ville + " " + s.nom + " " + s.marque).toUpperCase();
+                
+                // On cherche si une marque connue est cachée dans ce texte
+                for (let marque of MARQUES_CLEFS) {
+                    if (texteBrut.includes(marque)) {
+                        nomNettoye = marque;
+                        break;
+                    }
+                }
+                
                 if (s.geom) {
-                    L.marker([s.geom.lat, s.geom.lon]).addTo(markers).bindPopup(`<b>${s.marque || 'Station'}</b><br>${s.gazole_prix || '--'}€`);
-                    points.push([s.geom.lat, s.geom.lon]);
+                    const m = L.marker([s.geom.lat, s.geom.lon]).bindPopup(`<b>${nomNettoye}</b><br>${s.gazole_prix || '--'}€`);
+                    markersLayer.addLayer(m);
+                    bounds.push([s.geom.lat, s.geom.lon]);
                 }
 
-                resultsDiv.innerHTML += `
-                    <div class="station-card">
-                        <div class="brand">${i === 0 ? '🏆 ' : ''}${s.marque || 'STATION'}</div>
-                        <div style="font-size:11px; opacity:0.7">${s.adresse}, ${s.ville}</div>
-                        <div class="price-grid">
-                            <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-value">${s.gazole_prix || '--'}€</span></div>
-                            <div class="price-item"><span class="p-label">SP95-E10</span><span class="p-value">${s.e10_prix || '--'}€</span></div>
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="brand">${i === 0 ? '🏆 ' : ''}${nomNettoye}</div>
+                    <div class="address"><i class="fas fa-map-marker-alt"></i> ${s.adresse}, ${s.ville}</div>
+                    
+                    <div class="price-grid">
+                        <div class="price-item">
+                            <span class="f-name">GAZOLE</span>
+                            <span class="f-val">${s.gazole_prix || '--'}€</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="f-name">SP95-E10</span>
+                            <span class="f-val">${s.e10_prix || '--'}€</span>
                         </div>
                     </div>
                 `;
+                resultsDiv.appendChild(card);
             });
 
-            map.fitBounds(points, {padding: [30, 30]});
-            setTimeout(() => map.invalidateSize(), 400);
+            map.fitBounds(bounds);
+            setTimeout(() => map.invalidateSize(), 200);
 
-        } catch (error) {
+        } catch (e) {
             loader.style.display = "none";
             alert("Erreur de connexion.");
         }
