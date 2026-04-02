@@ -9,71 +9,46 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root { --green: #00ff87; --blue: #00d2ff; --glass: rgba(255, 255, 255, 0.08); }
+        :root { --green: #00ff87; --blue: #00d2ff; --red: #ff4757; --glass: rgba(255, 255, 255, 0.08); }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0f172a; color: white; padding-bottom: 50px; }
         
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
         
-        /* Header avec Logo Pompe */
-        .header { 
-            text-align: center; 
-            padding: 30px 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 10px;
-        }
-        .pump-logo {
-            font-size: 3rem;
-            color: var(--green);
-            filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5));
-            margin-bottom: 5px;
-        }
+        .header { text-align: center; padding: 30px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pump-logo { font-size: 3rem; color: var(--green); filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5)); margin-bottom: 5px; }
         .header h1 { margin: 0; letter-spacing: 4px; font-size: 1.8rem; text-transform: uppercase; }
 
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 20px; margin-bottom: 20px; }
 
         .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
-        input, select {
-            flex: 1; padding: 15px; background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 15px; color: white; outline: none; font-size: 16px;
-        }
+        input, select { flex: 1; padding: 15px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; color: white; outline: none; font-size: 16px; }
 
-        #customRangeBox { display: none; margin-bottom: 12px; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        #customRangeBox { display: none; margin-bottom: 12px; }
 
         .btn-gps { background: rgba(0, 210, 255, 0.15); color: var(--blue); width: 55px; border-radius: 15px; border: 1px solid var(--blue); cursor: pointer; }
         .btn-main { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--green), var(--blue)); color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        #map { height: 280px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; }
+        #map { height: 350px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; z-index: 1; }
 
-        .card { background: var(--glass); padding: 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; transition: 0.3s; }
-        .card:hover { border-color: var(--blue); transform: translateY(-2px); }
-        .brand { font-size: 1.4rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; }
+        .card { background: var(--glass); padding: 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; position: relative; }
+        .card-index { position: absolute; top: 15px; right: 20px; background: var(--blue); color: #000; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; }
+        .card.cheapest .card-index { background: var(--red); color: white; }
+        
+        .brand { font-size: 1.4rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; padding-right: 30px; }
         .address { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 15px; display: block; }
 
         .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .price-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .price-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
         .p-label { font-size: 0.7rem; font-weight: bold; color: var(--blue); }
         .p-val { font-size: 1.2rem; font-weight: 900; }
 
-        .btn-nav { 
-            width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); 
-            color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; 
-            text-decoration: none; display: flex; align-items: center; justify-content: center; 
-            gap: 10px; font-weight: 800; font-size: 0.9rem;
-        }
+        .btn-nav { width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; }
 
         #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
+        
+        /* Style des Popups sur la carte */
+        .leaflet-popup-content-wrapper { background: #1e293b; color: white; border-radius: 15px; }
+        .leaflet-popup-tip { background: #1e293b; }
     </style>
 </head>
 <body>
@@ -93,18 +68,12 @@
         <select id="rangeSelect" onchange="checkCustom()">
             <option value="5000">Rayon : 5 km</option>
             <option value="10000" selected>Rayon : 10 km</option>
-            <option value="15000">Rayon : 15 km</option>
             <option value="20000">Rayon : 20 km</option>
-            <option value="30000">Rayon : 30 km</option>
-            <option value="40000">Rayon : 40 km</option>
             <option value="50000">Rayon : 50 km</option>
             <option value="custom">Autres distances</option>
         </select>
 
-        <div id="customRangeBox">
-            <input type="number" id="customInput" placeholder="Nombre de KM (ex: 15)">
-        </div>
-
+        <div id="customRangeBox"><input type="number" id="customInput" placeholder="Distance en KM"></div>
         <button class="btn-main" style="margin-top:12px" onclick="rechercher()">Chercher</button>
     </div>
 
@@ -115,22 +84,18 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const MARQUES = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "VULCO", "CASINO", "AUCHAN", "BP", "SHELL", "NETTO", "SYSTEME U", "DYNEFF", "AGIP", "ELAN", "ATAC"];
-
+    const MARQUES = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "CASINO", "AUCHAN", "BP", "SHELL", "NETTO", "DYNEFF", "ELAN"];
     let map = L.map('map');
     let markersLayer = L.layerGroup().addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    function checkCustom() {
-        document.getElementById('customRangeBox').style.display = 
-            (document.getElementById('rangeSelect').value === 'custom') ? 'block' : 'none';
-    }
+    function checkCustom() { document.getElementById('customRangeBox').style.display = (document.getElementById('rangeSelect').value === 'custom') ? 'block' : 'none'; }
 
     function geolocaliser() {
         document.getElementById('loader').style.display = "block";
         navigator.geolocation.getCurrentPosition(
-            (pos) => rechercher(pos.coords.latitude, pos.coords.longitude),
-            () => { document.getElementById('loader').style.display = "none"; alert("Activez la localisation"); }
+            (p) => rechercher(p.coords.latitude, p.coords.longitude),
+            () => { document.getElementById('loader').style.display = "none"; alert("Activez le GPS"); }
         );
     }
 
@@ -138,28 +103,23 @@
         const query = document.getElementById('searchInput').value.trim();
         const rSelect = document.getElementById('rangeSelect').value;
         const cInput = document.getElementById('customInput').value;
-        const loader = document.getElementById('loader');
         const resultsDiv = document.getElementById('results');
 
         let rayon = (rSelect === 'custom') ? (parseInt(cInput) * 1000) : parseInt(rSelect);
-        if (rSelect === 'custom' && !cInput) { alert("Entrez une distance"); return; }
-
-        loader.style.display = "block";
+        document.getElementById('loader').style.display = "block";
         resultsDiv.innerHTML = "";
         markersLayer.clearLayers();
 
         let filter = (lat && lon) ? `within_distance(geom, geom'POINT(${lon} ${lat})', ${rayon}m)` : 
                      (/^\d{5}$/.test(query) ? `cp="${query}"` : `ville LIKE "${query.toUpperCase()}"`);
 
-        const url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${encodeURIComponent(filter)}&limit=45`;
-
         try {
-            const res = await fetch(url);
+            const res = await fetch(`https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${encodeURIComponent(filter)}&limit=40`);
             const data = await res.json();
-            loader.style.display = "none";
+            document.getElementById('loader').style.display = "none";
 
             if (!data.results || data.results.length === 0) {
-                resultsDiv.innerHTML = "<p style='text-align:center'>Aucune station trouvée.</p>";
+                resultsDiv.innerHTML = "<p style='text-align:center'>Aucune station.</p>";
                 return;
             }
 
@@ -167,29 +127,42 @@
             let points = [];
             if(lat && lon) points.push([lat, lon]);
 
-            data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9)).forEach((s, i) => {
-                
+            // Tri par prix Gazole
+            data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9));
+
+            data.results.forEach((s, i) => {
                 let name = "Station";
                 let rawText = `${s.nom} ${s.marque} ${s.adresse}`.toUpperCase();
                 for (let m of MARQUES) { if (rawText.includes(m)) { name = m; break; } }
 
+                const idx = i + 1;
+                const isCheapest = (i === 0);
+
                 if (s.geom) {
-                    L.marker([s.geom.lat, s.geom.lon]).addTo(markersLayer).bindPopup(`<b>${name}</b>`);
+                    // Création de l'icône personnalisée (Rouge pour le moins cher, Bleu pour les autres)
+                    const markerColor = isCheapest ? "red" : "blue";
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div style="background-color:${markerColor}; color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.5)">${idx}</div>`,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+
+                    L.marker([s.geom.lat, s.geom.lon], {icon: icon}).addTo(markersLayer)
+                     .bindPopup(`<div style="color:white"><b>${idx}. ${name}</b><br>Gazole: ${s.gazole_prix || '--'}€<br>E10: ${s.e10_prix || '--'}€</div>`);
                     points.push([s.geom.lat, s.geom.lon]);
                 }
 
-                // LIEN GOOGLE MAPS PRÉCIS
-                const gMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.geom.lat},${s.geom.lon}`;
-
                 resultsDiv.innerHTML += `
-                    <div class="card">
-                        <span class="brand">${i === 0 ? 'MEILLEUR PRIX ' : ''}${name}</span>
+                    <div class="card ${isCheapest ? 'cheapest' : ''}">
+                        <div class="card-index">${idx}</div>
+                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
                             <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-val">${s.gazole_prix || '--'}€</span></div>
                             <div class="price-item"><span class="p-label">E10</span><span class="p-val">${s.e10_prix || '--'}€</span></div>
                         </div>
-                        <a href="${gMapsUrl}" target="_blank" class="btn-nav">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${s.geom.lat},${s.geom.lon}" target="_blank" class="btn-nav">
                             <i class="fas fa-directions"></i> Y ALLER
                         </a>
                     </div>
@@ -199,7 +172,7 @@
             map.fitBounds(points, {padding: [30, 30]});
             setTimeout(() => map.invalidateSize(), 300);
 
-        } catch (e) { loader.style.display = "none"; alert("Erreur connexion"); }
+        } catch (e) { document.getElementById('loader').style.display = "none"; alert("Erreur connexion"); }
     }
 </script>
 </body>
