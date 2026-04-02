@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PRIX CARBURANT</title>
+    <title>PRIX CARBURANT TOTAL</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -34,17 +34,13 @@
         .brand { font-size: 1.3rem; font-weight: 900; color: var(--green); text-transform: uppercase; margin-bottom: 5px; display: block; padding-right: 40px; }
         .address { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 15px; display: block; }
 
-        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .price-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .p-label { font-size: 0.7rem; font-weight: bold; color: var(--blue); }
-        .p-val { font-size: 1.2rem; font-weight: 900; }
+        /* Grille adaptative pour les prix */
+        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .price-item { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .p-label { font-size: 0.65rem; font-weight: bold; color: var(--blue); }
+        .p-val { font-size: 1.1rem; font-weight: 900; }
 
-        .btn-nav { 
-            width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); 
-            color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; 
-            text-decoration: none; display: flex; align-items: center; justify-content: center; 
-            gap: 10px; font-weight: 800; box-sizing: border-box;
-        }
+        .btn-nav { width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; box-sizing: border-box; }
 
         #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
 
@@ -66,6 +62,7 @@
             <option value="5000">Rayon : 5 km</option>
             <option value="10000" selected>Rayon : 10 km</option>
             <option value="20000">Rayon : 20 km</option>
+            <option value="50000">Rayon : 50 km</option>
             <option value="custom">Autres distances</option>
         </select>
         <div id="customRangeBox"><input type="number" id="customInput" placeholder="Distance en KM"></div>
@@ -80,6 +77,17 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     const MARQUES = ["TOTAL", "INTERMARCHE", "LECLERC", "CARREFOUR", "SUPER U", "ESSO", "AVIA", "AUCHAN", "BP", "SHELL", "NETTO", "DYNEFF", "ELAN", "CASINO"];
+    
+    // Liste des types de carburants à vérifier
+    const TYPES = [
+        { key: 'gazole_prix', label: 'GAZOLE' },
+        { key: 'e10_prix', label: 'E10' },
+        { key: 'sp95_prix', label: 'SP95' },
+        { key: 'sp98_prix', label: 'SP98' },
+        { key: 'e85_prix', label: 'E85' },
+        { key: 'gplc_prix', label: 'GPL' }
+    ];
+
     let map = L.map('map');
     let markersLayer = L.layerGroup().addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
@@ -115,6 +123,7 @@
             document.getElementById('map').style.display = "block";
             let points = [];
 
+            // Tri par Gazole
             data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9)).forEach((s, i) => {
                 let name = "Station";
                 let rawText = `${s.nom} ${s.marque} ${s.adresse}`.toUpperCase();
@@ -122,6 +131,21 @@
 
                 const isCheapest = (i === 0);
                 const color = isCheapest ? "#ff4757" : "#00d2ff";
+
+                // Générer HTML des prix dynamiquement
+                let priceHTML = "";
+                let popupHTML = `<b>Station n°${i+1}</b><br>${name}<br>`;
+                
+                TYPES.forEach(t => {
+                    if (s[t.key]) {
+                        priceHTML += `
+                            <div class="price-item">
+                                <span class="p-label">${t.label}</span>
+                                <span class="p-val">${s[t.key]}€</span>
+                            </div>`;
+                        popupHTML += `⛽ ${t.label}: ${s[t.key]}€<br>`;
+                    }
+                });
 
                 if (s.geom) {
                     const pinIcon = L.divIcon({
@@ -131,19 +155,17 @@
                         iconAnchor: [15, 30]
                     });
 
-                    L.marker([s.geom.lat, s.geom.lon], {icon: pinIcon}).addTo(markersLayer)
-                     .bindPopup(`<b>Station n°${i+1}</b><br>${name}<br>Gazole: ${s.gazole_prix || '--'}€`);    
+                    L.marker([s.geom.lat, s.geom.lon], {icon: pinIcon}).addTo(markersLayer).bindPopup(popupHTML);
                     points.push([s.geom.lat, s.geom.lon]);
                 }
 
                 resultsDiv.innerHTML += `
                     <div class="card ${isCheapest ? 'cheapest' : ''}">
                         <div class="card-num">${i+1}</div>
-                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
+                        <span class="brand">${isCheapest ? '🏆 ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
-                            <div class="price-item"><span class="p-label">GAZOLE</span><span class="p-val">${s.gazole_prix || '--'}€</span></div>
-                            <div class="price-item"><span class="p-label">E10</span><span class="p-val">${s.e10_prix || '--'}€</span></div>
+                            ${priceHTML}
                         </div>
                         <a href="https://www.google.com/maps/dir/?api=1&destination=${s.geom.lat},${s.geom.lon}" target="_blank" class="btn-nav">
                             <i class="fas fa-directions"></i> Y ALLER
