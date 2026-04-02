@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PRIX CARBURANT TOTAL</title>
+    <title>PRIX CARBURANT</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -143,7 +143,7 @@
                                 <span class="p-label">${t.label}</span>
                                 <span class="p-val">${s[t.key]}€</span>
                             </div>`;
-                        popupHTML += `⛽ ${t.label}: ${s[t.key]}€<br>`;
+                        popupHTML += ` ${t.label}: ${s[t.key]}€<br>`;
                     }
                 });
 
@@ -162,7 +162,7 @@
                 resultsDiv.innerHTML += `
                     <div class="card ${isCheapest ? 'cheapest' : ''}">
                         <div class="card-num">${i+1}</div>
-                        <span class="brand">${isCheapest ? '🏆 ' : ''}${name}</span>
+                        <span class="brand">${isCheapest ? 'MEILLEUR PRIX ' : ''}${name}</span>
                         <span class="address">${s.adresse}, ${s.ville}</span>
                         <div class="price-grid">
                             ${priceHTML}
