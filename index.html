@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PRIX CARBURANT</title>
+    <title>PRIX CARBURANT PRO</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,16 +12,24 @@
         :root { --green: #00ff87; --blue: #00d2ff; --red: #ff4757; --glass: rgba(255, 255, 255, 0.08); --bg: #0f172a; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: white; padding-bottom: 50px; }
         
-        .container { padding: 15px; max-width: 600px; margin: 0 auto; position: relative; }
-        
-        /* Bouton Installation */
-        .install-help { position: absolute; top: 20px; right: 15px; font-size: 1.5rem; color: var(--blue); cursor: pointer; z-index: 10; }
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
 
-        .header { text-align: center; padding: 30px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .pump-logo { font-size: 3rem; color: var(--green); filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5)); }
-        .header h1 { margin: 0; letter-spacing: 4px; font-size: 1.8rem; text-transform: uppercase; }
+        .header { text-align: center; padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pump-logo { font-size: 2.5rem; color: var(--green); filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.5)); }
+        .header h1 { margin: 0; letter-spacing: 4px; font-size: 1.6rem; text-transform: uppercase; }
 
         .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 20px; margin-bottom: 20px; }
+        
+        /* Nouveau Bouton Installer l'App */
+        .btn-install-app { 
+            width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); 
+            color: var(--blue); border: 1px dashed var(--blue); border-radius: 15px; 
+            font-weight: bold; cursor: pointer; margin-bottom: 15px; 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 0.9rem; transition: 0.3s;
+        }
+        .btn-install-app:hover { background: rgba(0, 210, 255, 0.1); }
+
         .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
         input, select { flex: 1; padding: 15px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; color: white; outline: none; font-size: 16px; }
 
@@ -29,7 +37,7 @@
         .btn-gps { background: rgba(0, 210, 255, 0.15); color: var(--blue); width: 55px; border-radius: 15px; border: 1px solid var(--blue); cursor: pointer; }
         .btn-main { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--green), var(--blue)); color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        #map { height: 350px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; }
+        #map { height: 300px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; display: none; }
 
         .card { background: var(--glass); padding: 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; position: relative; }
         .card-num { position: absolute; top: 15px; right: 20px; background: var(--blue); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; }
@@ -45,12 +53,15 @@
 
         .btn-nav { width: 100%; padding: 14px; background: rgba(0, 210, 255, 0.05); color: var(--blue); border: 1px solid var(--blue); border-radius: 15px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; box-sizing: border-box; }
 
-        /* Fenêtre Modal Instructions */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
-        .modal-content { background: #1e293b; margin: 15% auto; padding: 25px; border-radius: 25px; width: 85%; max-width: 450px; border: 1px solid var(--blue); }
-        .modal-content h2 { color: var(--green); margin-top: 0; font-size: 1.2rem; }
-        .modal-content ul { padding-left: 20px; font-size: 0.9rem; line-height: 1.6; }
-        .close-modal { float: right; font-size: 28px; cursor: pointer; color: var(--red); }
+        /* Modal Instructions Détaillées */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { background: #1e293b; margin: 10% auto; padding: 30px; border-radius: 30px; width: 85%; max-width: 500px; border: 1px solid var(--blue); position: relative; }
+        .modal-content h2 { color: var(--green); margin-top: 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .inst-block { margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; }
+        .inst-block h3 { color: var(--blue); font-size: 1rem; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .modal-content ol { padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: rgba(255,255,255,0.8); }
+        .modal-content li { margin-bottom: 8px; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--red); }
 
         #loader { display: none; text-align: center; padding: 20px; color: var(--green); }
     </style>
@@ -58,14 +69,16 @@
 <body>
 
 <div class="container">
-    <div class="install-help" onclick="toggleModal()"><i class="fas fa-plus-square"></i></div>
-    
     <div class="header">
         <i class="fas fa-gas-pump pump-logo"></i>
         <h1>PRIX CARBURANT</h1>
     </div>
 
     <div class="glass-panel">
+        <button class="btn-install-app" onclick="toggleModal()">
+            <i class="fas fa-mobile-alt"></i> INSTALLER L'APPLICATION
+        </button>
+
         <div class="search-row">
             <input type="text" id="searchInput" placeholder="Ville ou Code Postal">
             <button class="btn-gps" onclick="geolocaliser()"><i class="fas fa-location-arrow"></i></button>
@@ -75,10 +88,10 @@
             <option value="10000" selected>Rayon : 10 km</option>
             <option value="20000">Rayon : 20 km</option>
             <option value="50000">Rayon : 50 km</option>
-            <option value="custom">Autres distances</option>
+            <option value="custom">Distance perso...</option>
         </select>
-        <div id="customRangeBox"><input type="number" id="customInput" placeholder="Distance en KM"></div>
-        <button class="btn-main" style="margin-top:12px" onclick="rechercher()">Chercher</button>
+        <div id="customRangeBox"><input type="number" id="customInput" placeholder="KM (ex: 15)"></div>
+        <button class="btn-main" style="margin-top:12px" onclick="rechercher()">Rechercher</button>
     </div>
 
     <div id="map"></div>
@@ -88,25 +101,37 @@
 
 <div id="installModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="toggleModal()">&times;</span>
-        <h2>📲 Ajouter à l'écran d'accueil</h2>
+        <span class="close-modal" onclick="toggleModal()">×</span>
+        <h2><i class="fas fa-magic"></i> Installation Guide</h2>
         
-        <p><strong>iPhone / iPad :</strong></p>
-        <ul>
-            <li>Appuyez sur le bouton <strong>Partager</strong> <i class="fas fa-share-square"></i> en bas de Safari.</li>
-            <li>Faites défiler et choisissez <strong>"Sur l'écran d'accueil"</strong>.</li>
-        </ul>
+        <div class="inst-block">
+            <h3><i class="fab fa-apple"></i> iOS (iPhone / iPad)</h3>
+            <ol>
+                <li>Ouvrez ce site dans <strong>Safari</strong>.</li>
+                <li>Appuyez sur l'icône <strong>Partager</strong> <i class="fas fa-share-square"></i> (le carré avec une flèche en bas).</li>
+                <li>Faites défiler le menu vers le bas.</li>
+                <li>Sélectionnez <strong>"Sur l'écran d'accueil"</strong>.</li>
+                <li>Appuyez sur <strong>Ajouter</strong> en haut à droite.</li>
+            </ol>
+        </div>
 
-        <p><strong>Android :</strong></p>
-        <ul>
-            <li>Appuyez sur les <strong>3 points</strong> <i class="fas fa-ellipsis-v"></i> en haut à droite de Chrome.</li>
-            <li>Choisissez <strong>"Ajouter à l'écran d'accueil"</strong>.</li>
-        </ul>
+        <div class="inst-block">
+            <h3><i class="fab fa-android"></i> Android (Chrome)</h3>
+            <ol>
+                <li>Appuyez sur les <strong>3 points verticaux</strong> <i class="fas fa-ellipsis-v"></i> en haut à droite.</li>
+                <li>Sélectionnez <strong>"Installer l'application"</strong> ou <strong>"Ajouter à l'écran d'accueil"</strong>.</li>
+                <li>Confirmez en appuyant sur <strong>Ajouter</strong>.</li>
+            </ol>
+        </div>
 
-        <p><strong>PC / Mac :</strong></p>
-        <ul>
-            <li>Cliquez sur l'icône <i class="fas fa-download"></i> dans la barre d'adresse ou allez dans les options du navigateur.</li>
-        </ul>
+        <div class="inst-block">
+            <h3><i class="fab fa-windows"></i> PC / Mac (Chrome/Edge)</h3>
+            <ol>
+                <li>Regardez à droite de la <strong>barre d'adresse</strong> en haut.</li>
+                <li>Cliquez sur l'icône <strong>Installer</strong> <i class="fas fa-download"></i> (petit écran avec une flèche).</li>
+                <li>L'application s'ouvrira alors dans sa propre fenêtre séparée.</li>
+            </ol>
+        </div>
     </div>
 </div>
 
@@ -137,7 +162,10 @@
         document.getElementById('loader').style.display = "block";
         navigator.geolocation.getCurrentPosition(
             (p) => rechercher(p.coords.latitude, p.coords.longitude),
-            () => { document.getElementById('loader').style.display = "none"; alert("Activez le GPS"); }
+            (err) => { 
+                document.getElementById('loader').style.display = "none"; 
+                alert("Permission refusée. Activez la localisation dans les réglages."); 
+            }
         );
     }
 
@@ -157,11 +185,12 @@
             const res = await fetch(`https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=${encodeURIComponent(filter)}&limit=40`);
             const data = await res.json();
             document.getElementById('loader').style.display = "none";
-            if (!data.results.length) return;
+            if (!data.results.length) { alert("Aucune station trouvée"); return; }
 
             document.getElementById('map').style.display = "block";
             let points = [];
 
+            // Tri par Gazole
             data.results.sort((a,b) => (parseFloat(a.gazole_prix)||9)-(parseFloat(b.gazole_prix)||9)).forEach((s, i) => {
                 let name = "Station";
                 let rawText = `${s.nom} ${s.marque} ${s.adresse}`.toUpperCase();
